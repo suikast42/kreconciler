@@ -115,15 +115,15 @@ var DefaultHasher = WorkerHasherFunc(func(_ context.Context, id string, count in
 
 // EventHandler called whenever an event is triggered
 type EventHandler interface {
-	Call(ctx context.Context, jobId string) error
+	Call(ctx context.Context, event any) error
 }
 
 // EventHandlerFunc see EventHandler
-type EventHandlerFunc func(ctx context.Context, jobId string) error
+type EventHandlerFunc func(ctx context.Context, event any) error
 
 // Call calls f(ctx, jobId).
-func (f EventHandlerFunc) Call(ctx context.Context, jobId string) error {
-	return f(ctx, jobId)
+func (f EventHandlerFunc) Call(ctx context.Context, event any) error {
+	return f(ctx, event)
 }
 
 // MeteredEventHandler adds metrics any event reconciler
@@ -133,7 +133,7 @@ func MeteredEventHandler(meter metric.Meter, name string, child EventHandler) (E
 		return nil, err
 	}
 
-	return EventHandlerFunc(func(ctx context.Context, jobId string) (err error) {
+	return EventHandlerFunc(func(ctx context.Context, event any) (err error) {
 		defer func() {
 			attributes := []attribute.KeyValue{attribute.String("stream", name)}
 
@@ -145,7 +145,7 @@ func MeteredEventHandler(meter metric.Meter, name string, child EventHandler) (E
 
 			counter.Add(ctx, 1, attributes...)
 		}()
-		err = child.Call(ctx, jobId)
+		err = child.Call(ctx, event)
 		return
 	}), nil
 }

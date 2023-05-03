@@ -2,6 +2,7 @@ package kreconciler
 
 import (
 	"context"
+	"fmt"
 	"sync"
 )
 
@@ -118,8 +119,20 @@ func (c *controller) Run(ctx context.Context) error {
 	return nil
 }
 
-func (c *controller) enqueue(ctx context.Context, id string) error {
+type Identity interface {
+	Id() string
+}
+
+func (c *controller) enqueue(ctx context.Context, event any) error {
 	// Simply discard items with empty ids
+	var id string
+	if event != nil {
+		if _id, ok := event.(Identity); ok {
+			id = _id.Id()
+		} else {
+			id = fmt.Sprintf("%+v", event)
+		}
+	}
 	if id == "" {
 		return nil
 	}

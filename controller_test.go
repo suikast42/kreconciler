@@ -177,8 +177,8 @@ func TestResyncLoopEventStream(t *testing.T) {
 	idChannel := make(chan string, 10)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	go stream.Subscribe(ctx, EventHandlerFunc(func(_ context.Context, id string) error {
-		idChannel <- id
+	go stream.Subscribe(ctx, EventHandlerFunc(func(_ context.Context, event any) error {
+		idChannel <- fmt.Sprintf("%+v", event)
 		return nil
 	}))
 	for _, v := range []string{"a", "b", "c"} {
