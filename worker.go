@@ -169,6 +169,7 @@ type item struct {
 	ctx              context.Context
 	tryCount         int
 	id               string
+	event            any
 	maxTries         int
 	firstEnqueueTime time.Time
 	lastEnqueueTime  time.Time
@@ -176,7 +177,7 @@ type item struct {
 
 var errQueueAtCapacityError = errors.New("queue at capacity, retry later")
 
-func (w *worker) Enqueue(id string) error {
+func (w *worker) Enqueue(id string, event any) error {
 	ctx, _ := w.Observability.Start(context.Background(), "reconcile",
 		trace.WithSpanKind(trace.SpanKindConsumer),
 		trace.WithNewRoot(),
@@ -185,7 +186,7 @@ func (w *worker) Enqueue(id string) error {
 		),
 	)
 
-	return w.enqueue(item{ctx: ctx, id: id, maxTries: w.maxTries, firstEnqueueTime: time.Now()})
+	return w.enqueue(item{ctx: ctx, id: id, maxTries: w.maxTries, firstEnqueueTime: time.Now(), event: event})
 }
 
 func (w *worker) enqueue(i item) error {
@@ -283,7 +284,7 @@ func (w *worker) handle(i item) Result {
 	l.Debug("Get event for item", "object_id", i.id)
 	start := time.Now()
 	w.metrics.queueTime.Record(i.ctx, start.Sub(i.lastEnqueueTime).Milliseconds(), attrWorkerId(w.id))
-	res := w.handler.Apply(handleCtx, i.id)
+	res := w.handler.Apply(handleCtx, i.event)
 	// Retry if required based on the result.
 	if res.Error != nil {
 		span.RecordError(res.Error)
