@@ -134,7 +134,7 @@ func decorateMeter(w *worker, meter metric.Meter) error {
 }
 
 func newPanicReconciler(obs Observability, delegate Reconciler) Reconciler {
-	return ReconcilerFunc(func(ctx context.Context, id string) (r Result) {
+	return ReconcilerFunc(func(ctx context.Context, event any) (r Result) {
 		defer func() {
 			if err := recover(); err != nil {
 				l := obs.LoggerWithCtx(ctx)
@@ -148,7 +148,7 @@ func newPanicReconciler(obs Observability, delegate Reconciler) Reconciler {
 				}
 			}
 		}()
-		r = delegate.Apply(ctx, id)
+		r = delegate.Apply(ctx, event)
 		return
 	})
 }
@@ -157,11 +157,11 @@ func newReconcilerWithTimeout(delegate Reconciler, timeout time.Duration) Reconc
 	if timeout == 0 {
 		return delegate
 	}
-	return ReconcilerFunc(func(ctx context.Context, id string) Result {
+	return ReconcilerFunc(func(ctx context.Context, event any) Result {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, timeout)
 		defer cancel()
-		return delegate.Apply(ctx, id)
+		return delegate.Apply(ctx, event)
 	})
 }
 

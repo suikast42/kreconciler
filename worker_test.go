@@ -227,7 +227,7 @@ type handlerMock struct {
 	mock.Mock
 }
 
-func (h *handlerMock) Apply(ctx context.Context, id string) Result {
+func (h *handlerMock) Apply(ctx context.Context, id any) Result {
 	res := h.Called(ctx, id)
 	return res.Get(0).(Result)
 }

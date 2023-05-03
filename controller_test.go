@@ -17,13 +17,13 @@ type countingHandler struct {
 	calls map[string]int
 }
 
-func (h *countingHandler) Apply(ctx context.Context, id string) Result {
+func (h *countingHandler) Apply(ctx context.Context, id any) Result {
 	h.Lock()
 	defer h.Unlock()
 	if h.calls == nil {
 		h.calls = map[string]int{}
 	}
-	h.calls[id] += 1
+	h.calls[fmt.Sprintf("%+v", id)] += 1
 	return Result{}
 }
 

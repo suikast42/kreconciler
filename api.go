@@ -51,15 +51,15 @@ func DefaultConfig() Config {
 // Reconciler is the core implementation of the control-loop.
 type Reconciler interface {
 	// Apply handle the item and potentially return an error
-	Apply(ctx context.Context, id string) Result
+	Apply(ctx context.Context, id any) Result
 }
 
 // ReconcilerFunc see Reconciler
-type ReconcilerFunc func(ctx context.Context, id string) Result
+type ReconcilerFunc func(ctx context.Context, event any) Result
 
-// Apply calls f(ctx, id).
-func (f ReconcilerFunc) Apply(ctx context.Context, id string) Result {
-	return f(ctx, id)
+// Apply calls f(ctx, event).
+func (f ReconcilerFunc) Apply(ctx context.Context, event any) Result {
+	return f(ctx, event)
 }
 
 // Result a wrapper that is returned by a Reconciler.
