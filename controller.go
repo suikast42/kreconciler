@@ -144,5 +144,5 @@ func (c *controller) enqueue(ctx context.Context, event any) error {
 		c.Debug("Dropping item", "id", id)
 		return nil
 	}
-	return c.workers[workerId].Enqueue(id)
+	return c.workers[workerId].Enqueue(id, event)
 }
