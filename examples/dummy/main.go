@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 
-	err = kreconciler.New(cfg, kreconciler.ReconcilerFunc(func(ctx context.Context, id string) kreconciler.Result {
+	err = kreconciler.New(cfg, kreconciler.ReconcilerFunc(func(ctx context.Context, id any) kreconciler.Result {
 		cfg.Observability.Info("Got reconcile call", "id", id)
 		return kreconciler.Result{}
 	}), map[string]kreconciler.EventStream{

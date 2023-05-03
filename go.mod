@@ -20,3 +20,5 @@ require (
 	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
+
+replace github.com/koyeb/kreconciler => github.com/suikast42/kreconciler v0.0.0-20220921094825-838b10462478
